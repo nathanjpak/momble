@@ -1,0 +1,8 @@
+# Ignore env files
+*.env
+
+# Ignore word data
+/server/data
+
+# Ignore node_modules
+/server/node_modules
