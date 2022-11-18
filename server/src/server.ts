@@ -1,13 +1,21 @@
 const axios = require("axios");
+
 import e from "express";
+import * as path from "path";
+
 import express from "express";
 import http from "http";
 import mongoose from "mongoose";
 import { config } from "./config/config";
 import Logging from "./library/Logging";
 
+// Routes
+const clientRoutes = require("./routes/Client");
+
+// Models
 const Word = require("./models/Word");
 
+// Data
 const wordData = require("../data/words.json");
 
 const router = express();
@@ -53,6 +61,11 @@ const StartServer = () => {
   });
 
   // Routes
+  router.use(express.static(path.join(__dirname, "../../client/build")))
+  router.get('*', (req, res, next) => {
+    res.sendFile(path.resolve(__dirname, "../../client/build", "index.html"))
+  })
+  // router.use("/", clientRoutes);
 
   // Healthcheck
   router.get("/ping", (req, res, next) => res.status(200).json({message: "pong"}));
