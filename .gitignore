@@ -1,8 +1,15 @@
 # Ignore env files
 *.env
 
+# Ignore prettier config files
+*.prettierrc
+
 # Ignore word data
 /server/data
 
+# Ignore frontend build
+/client/build
+
 # Ignore node_modules
 /server/node_modules
+/client/node_modules
