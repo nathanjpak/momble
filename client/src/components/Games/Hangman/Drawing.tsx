@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 // individual parts of the drawing
 
@@ -46,10 +46,36 @@ const leftLeg = (
 
 const bodyPartsArray = [head, body, rightArm, leftArm, rightLeg, leftLeg];
 
-export default function HangmanDrawing() {
+const mustache = (
+  <>
+    <div className="absolute right-1/4 top-1/4 h-1/32 rounded-mustache-left aspect-square bg-black rotate-30 origin-top-right z-10" />
+    <div className="absolute left-3/4 top-1/4 h-1/32 rounded-mustache-right aspect-square bg-black -rotate-30 origin-top-left z-10" />
+  </>
+);
+
+const sunglasses = (
+  <>
+    <div className="absolute top-1/5 right-1/4 w-1/16 sm:w-1/32 max-w-[18px] border-t-8 border-t-black border-x-4 border-x-transparent opacity-80 shadow-sm z-10" />
+    <div className="absolute top-1/5 left-3/4 w-1/16 sm:w-1/32 max-w-[18px] border-t-8 border-t-black border-x-4 border-x-transparent opacity-80 shadow-sm z-10" />
+  </>
+);
+
+const miscPartsArray = [mustache, sunglasses];
+
+type HangmanDrawingProps = {
+  numberOfGuesses: number;
+};
+
+export default function HangmanDrawing({
+  numberOfGuesses,
+}: HangmanDrawingProps) {
+  let randIndex = Math.floor(Math.random() * miscPartsArray.length);
+  const [seventhPart, setSeventhPart] = useState(miscPartsArray[randIndex]);
+  bodyPartsArray.push(seventhPart);
+
   return (
     <div className="w-5/6 max-w-2xl relative flex flex-col items-center pt-2 sm:pt-4">
-      {bodyPartsArray}
+      {bodyPartsArray.slice(0, numberOfGuesses)}
       {/* Drawing the 'gallow' */}
       <div
         className="border-l-10 border-black w-0"

@@ -17,6 +17,10 @@ export default function Hangman() {
     });
   }, [level]);
 
+  useEffect(() => {
+    wordToGuess.length >= 6 ? setLives(6) : setLives(7);
+  }, [wordToGuess]);
+
   const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
 
   const incorrectLetters = guessedLetters.filter(
@@ -58,7 +62,7 @@ export default function Hangman() {
   return (
     <div className="flex flex-col w-full p-2 space-y-4">
       <div className="w-full bg-white flex flex-col items-center gap-8">
-        <HangmanDrawing />
+        <HangmanDrawing numberOfGuesses={incorrectLetters.length} />
         <HangmanWord
           wordToGuess={wordToGuess}
           guessedLetters={guessedLetters}
