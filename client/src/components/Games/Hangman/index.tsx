@@ -65,7 +65,14 @@ export default function Hangman() {
           reveal={isLoser}
         />
       </div>
-      <HangmanKeyboard />
+      <HangmanKeyboard
+        disabled={isWinner || isLoser}
+        activeLetters={guessedLetters.filter((letter) =>
+          wordToGuess.includes(letter)
+        )}
+        inactiveLetters={incorrectLetters}
+        addGuessedLetter={addGuessedLetter}
+      />
     </div>
   );
 }
