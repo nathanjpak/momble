@@ -35,6 +35,7 @@ const config_1 = require("./config/config");
 const Logging_1 = __importDefault(require("./library/Logging"));
 // Routes
 const clientRoutes = require("./routes/Client");
+const wordRoutes = require("./routes/Word");
 // Models
 const Word = require("./models/Word");
 // Data
@@ -73,6 +74,7 @@ const StartServer = () => {
         next();
     });
     // Routes
+    router.use('/api', wordRoutes);
     router.use(express_1.default.static(path.join(__dirname, "../../client/build")));
     router.get('*', (req, res, next) => {
         res.sendFile(path.resolve(__dirname, "../../client/build", "index.html"));
@@ -87,6 +89,13 @@ const StartServer = () => {
         return res.status(404).json({ message: error.message });
     });
     http_1.default.createServer(router).listen(config_1.config.server.port, () => Logging_1.default.info(`Server is running on port ${config_1.config.server.port}`));
+    // Word.aggregate(
+    //   [
+    //     { $addFields: {
+    //       length: { $strLenCP: "word" } 
+    //     } }
+    //   ]
+    // ).exec(() => console.log("success!"));
     // Add words to db
     // wordData.a2.prepositions.forEach((word:string) => {
     //   Word.find(
