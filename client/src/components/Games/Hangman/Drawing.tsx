@@ -48,7 +48,7 @@ const bodyPartsArray = [head, body, rightArm, leftArm, rightLeg, leftLeg];
 
 export default function HangmanDrawing() {
   return (
-    <div className="w-5/6 max-w-2xl relative flex flex-col items-center pt-4">
+    <div className="w-5/6 max-w-2xl relative flex flex-col items-center pt-2 sm:pt-4">
       {bodyPartsArray}
       {/* Drawing the 'gallow' */}
       <div
