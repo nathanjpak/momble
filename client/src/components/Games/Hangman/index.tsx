@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import HangmanDrawing from "./Drawing";
+import HangmanGuesses from "./Guesses";
 import HangmanKeyboard from "./Keyboard";
 import HangmanWord from "./Word";
 
 import { fetchWord } from "../../../util/functions";
+import Lose from "../../Modals/Lose";
+import Win from "../../Modals/Win";
 
 export default function Hangman() {
   const [level, setLevel] = useState("a1");
@@ -11,17 +14,29 @@ export default function Hangman() {
 
   const [wordToGuess, setWordToGuess] = useState("");
 
-  useEffect(() => {
+  const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
+
+  const resetWord = useCallback(() => {
+    setGuessedLetters([]);
     fetchWord(level).then((response) => {
       setWordToGuess(response.data[0].word);
     });
   }, [level]);
 
+  // const resetWord = () => {
+  //   // setGuessedLetters([]);
+  //   fetchWord(level).then((response) => {
+  //     setWordToGuess(response.data[0].word);
+  //   });
+  // };
+
+  useEffect(() => {
+    resetWord();
+  }, [resetWord]);
+
   useEffect(() => {
     wordToGuess.length >= 6 ? setLives(6) : setLives(7);
   }, [wordToGuess]);
-
-  const [guessedLetters, setGuessedLetters] = useState<string[]>([]);
 
   const incorrectLetters = guessedLetters.filter(
     (letter) => !wordToGuess.includes(letter)
@@ -59,15 +74,27 @@ export default function Hangman() {
     };
   }, [guessedLetters, addGuessedLetter]);
 
+  // Events for lose and win modals
+  const onLose = () => {
+    resetWord();
+  };
+
+  const onWin = () => {
+    resetWord();
+  };
+
   return (
-    <div className="flex flex-col w-full p-2 space-y-4">
-      <div className="w-full bg-white flex flex-col items-center gap-8">
+    <div className="flex flex-col w-full p-2 sm:p-6 space-y-4">
+      <div className="w-full relative bg-white flex flex-col items-center p-4 gap-8">
+        <HangmanGuesses incorrectLetters={incorrectLetters} />
         <HangmanDrawing numberOfGuesses={incorrectLetters.length} />
         <HangmanWord
           wordToGuess={wordToGuess}
           guessedLetters={guessedLetters}
           reveal={isLoser}
         />
+        <Lose bool={isLoser} onEnter={onLose} />
+        <Win bool={isWinner} onEnter={onWin} />
       </div>
       <HangmanKeyboard
         disabled={isWinner || isLoser}
@@ -76,6 +103,7 @@ export default function Hangman() {
         )}
         inactiveLetters={incorrectLetters}
         addGuessedLetter={addGuessedLetter}
+        resetWord={resetWord}
       />
     </div>
   );

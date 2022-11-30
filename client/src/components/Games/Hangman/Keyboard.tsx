@@ -70,7 +70,7 @@ const keyboardStyle = {
 
 const buttonClassNames = {
   default:
-    "bg-white shadow shadow-sm hover:enabled:shadow-md hover:enabled:-translate-y-0.5 active:shadow-sm active:transform-none",
+    "bg-white shadow shadow-sm hover:enabled:shadow-md hover:enabled:-translate-y-0.5 active:shadow-sm active:enabled:transform-none",
   active: "bg-cyan-300 text-white",
   inactive: "opacity-40 bg-slate-300 text-white",
 };
@@ -80,6 +80,7 @@ type HangmanKeyboardProps = {
   activeLetters: string[];
   inactiveLetters: string[];
   addGuessedLetter: (letter: string) => void;
+  resetWord: () => void;
 };
 
 export default function HangmanKeyboard({
@@ -87,6 +88,7 @@ export default function HangmanKeyboard({
   activeLetters,
   inactiveLetters,
   addGuessedLetter,
+  resetWord,
 }: HangmanKeyboardProps) {
   return (
     <div className="grid gap-1 h-auto" style={keyboardStyle.alphabetical}>
@@ -107,6 +109,10 @@ export default function HangmanKeyboard({
           </button>
         );
       })}
+      <button
+        onClick={() => resetWord()}
+        className="bg-cyan-600 text-white shadow-sm hover:shadow-md hover:-translate-y-0.5 active:transform-none"
+      >{`\u23CE`}</button>
     </div>
   );
 }
