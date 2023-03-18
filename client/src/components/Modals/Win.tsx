@@ -18,31 +18,17 @@ export default function Win({ bool, onEnter }: WinProps) {
     if (!bool) return;
     // Play animation
     const timeline = gsap.timeline({ autoRemoveChildren: true });
-    timeline.fromTo(
-      winText.current.children,
-      {
-        yPercent: -100,
-        opacity: 0,
-      },
-      {
-        yPercent: 0,
-        opacity: 1,
-        duration: 0.3,
-        stagger: 0.01,
-      }
-    );
-    timeline.fromTo(
-      enterMessage.current,
-      {
-        opacity: 0,
-      },
-      {
-        opacity: 1,
-        duration: 1,
-      }
-    );
+    timeline.from(winText.current.children, {
+      yPercent: -100,
+      opacity: 0,
+      duration: 0.3,
+      stagger: 0.01,
+    });
+    timeline.from(enterMessage.current, {
+      opacity: 0,
+      duration: 1,
+    });
     timeline.restart();
-    console.log(bool);
 
     // Add event listener
     const handler = (e: KeyboardEvent) => {

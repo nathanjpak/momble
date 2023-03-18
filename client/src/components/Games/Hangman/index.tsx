@@ -1,16 +1,18 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useContext } from "react";
 import HangmanDrawing from "./Drawing";
 import HangmanGuesses from "./Guesses";
 import HangmanKeyboard from "./Keyboard";
 import HangmanWord from "./Word";
+
+import { LevelContext } from "../../../Context";
 
 import { fetchWord } from "../../../util/functions";
 import Lose from "../../Modals/Lose";
 import Win from "../../Modals/Win";
 
 export default function Hangman() {
-  const [level, setLevel] = useState("a1");
-  const [lives, setLives] = useState(6);
+  const { level } = useContext(LevelContext);
+  const [lives, setLives] = useState(7);
 
   const [wordToGuess, setWordToGuess] = useState("");
 
@@ -19,6 +21,7 @@ export default function Hangman() {
   const resetWord = useCallback(() => {
     setGuessedLetters([]);
     fetchWord(level).then((response) => {
+      console.log(response.data);
       setWordToGuess(response.data[0].word);
     });
   }, [level]);
@@ -35,7 +38,7 @@ export default function Hangman() {
   }, [resetWord]);
 
   useEffect(() => {
-    wordToGuess.length >= 6 ? setLives(6) : setLives(7);
+    wordToGuess.length >= 6 ? setLives(7) : setLives(8);
   }, [wordToGuess]);
 
   const incorrectLetters = guessedLetters.filter(
@@ -94,7 +97,7 @@ export default function Hangman() {
           reveal={isLoser}
         />
         <Lose bool={isLoser} onEnter={onLose} />
-        <Win bool={isWinner} onEnter={onWin} />
+        <Win bool={isWinner && wordToGuess.length > 0} onEnter={onWin} />
       </div>
       <HangmanKeyboard
         disabled={isWinner || isLoser}

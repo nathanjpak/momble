@@ -14,7 +14,8 @@ module.exports = {
       },
       borderRadius: {
         'mustache-left': '100% 0% 100% 0% / 100% 0% 100% 0%',
-        'mustache-right' : '0% 100% 0% 100% / 0% 100% 0% 100% '
+        'mustache-right' : '0% 100% 0% 100% / 0% 100% 0% 100%',
+        'bowtie': '100% 0% 55% 45% / 55% 0% 100% 45% ',
       },
       borderWidth: {
         '5': '5px',
@@ -43,7 +44,8 @@ module.exports = {
       },
       rotate: {
         '30': '30deg',
-        '60': '60deg'
+        '60': '60deg',
+        '135': '135deg'
       }
     },
   },
