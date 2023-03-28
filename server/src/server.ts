@@ -64,17 +64,19 @@ const StartServer = () => {
   // Routes
   router.use('/api', wordRoutes);
 
-  router.use(express.static(path.join(__dirname, "../../client/build")))
-  router.get('*', (req, res, next) => {
-    res.sendFile(path.resolve(__dirname, "../../client/build", "index.html"))
-  })
+  // router.use(express.static(path.join(__dirname, "../../client/build")))
+  // router.get('*', (req, res, next) => {
+  //   res.sendFile(path.resolve(__dirname, "../../client/build", "index.html"))
+  // })
   // router.use("/", clientRoutes);
 
   // Healthcheck
   router.get("/ping", (req, res, next) => res.status(200).json({message: "pong"}));
 
+  router.get("/", (req, res, next) => res.status(200).send("Hello"));
+
   // Error handling
-  router.use((req, res,next) => {
+  router.use((req, res, next) => {
     const error = new Error("not found");
     Logging.error(error);
 
@@ -82,42 +84,6 @@ const StartServer = () => {
   });
 
   http.createServer(router).listen(config.server.port, () => Logging.info(`Server is running on port ${config.server.port}`));
-
-  // Word.aggregate(
-  //   [
-  //     { $addFields: {
-  //       length: { $strLenCP: "word" } 
-  //     } }
-  //   ]
-  // ).exec(() => console.log("success!"));
-
-  // Add words to db
-  // wordData.a2.prepositions.forEach((word:string) => {
-  //   Word.find(
-  //     { word: word, partOfSpeech: "preposition" }
-  //   ).exec((err:object, result:Array<object>) => {
-  //     if (err) {
-  //       console.log("not found!");
-  //     } else {
-  //       if (result.length > 0) {
-  //         Word.update({ word: word, partOfSpeech: "preposition" },
-  //         { $push: { level: "a2" } }
-  //         ).exec((err:object, result:Array<object>) => {
-  //           if (err) console.log(err);
-  //           if (result) console.log(`${word} updated!`);
-  //         })
-  //       } else {
-  //         const newWord = new Word({
-  //           word: word,
-  //           partOfSpeech: "preposition",
-  //           level: ["a2"],
-  //         });
-  //         newWord.save();
-  //       }
-  //     }
-  //   })
-
-  // });
 
   console.log("Finished!");
 };

@@ -7,8 +7,9 @@
 # Ignore word data
 /server/data
 
-# Ignore frontend build
+# Ignore build folders
 /client/build
+/server/build
 
 # Ignore node_modules
 /server/node_modules
