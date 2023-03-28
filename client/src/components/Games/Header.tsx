@@ -1,18 +1,24 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 
-import { LevelContext } from "../../Context";
+import { SoloContext } from "../../Context";
 
 export default function GamesHeader() {
-  const { level, setLevel } = useContext(LevelContext);
+  const { level, setLevel, streak, setStreak } = useContext(SoloContext);
 
   // TODO: use context to store level data
   const onChange = (event: any) => {
-    setLevel(event.target.value);
+    if (!streak) setLevel(event.target.value);
+    else if (
+      window.confirm("Are you sure? Changing the level will reset your streak.")
+    ) {
+      setStreak(0);
+      setLevel(event.target.value);
+    }
   };
 
   return (
-    <div className="w-screen">
+    <div className="w-screen flex">
       <Link to="..">Home</Link>
 
       <label htmlFor="level-select">Level:</label>
@@ -26,6 +32,7 @@ export default function GamesHeader() {
         <option value="a2">a2</option>
         <option value="b1">b1</option>
       </select>
+      <p>Streak: {streak}</p>
     </div>
   );
 }

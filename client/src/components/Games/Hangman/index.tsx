@@ -1,17 +1,19 @@
-import React, { useEffect, useState, useCallback, useContext } from "react";
+import { useEffect, useState, useCallback, useContext } from "react";
+
 import HangmanDrawing from "./Drawing";
 import HangmanGuesses from "./Guesses";
 import HangmanKeyboard from "./Keyboard";
 import HangmanWord from "./Word";
 
-import { LevelContext } from "../../../Context";
+import { SoloContext } from "../../../Context";
 
 import { fetchWord } from "../../../util/functions";
+
 import Lose from "../../Modals/Lose";
 import Win from "../../Modals/Win";
 
 export default function Hangman() {
-  const { level } = useContext(LevelContext);
+  const { level, streak, setStreak } = useContext(SoloContext);
   const [lives, setLives] = useState(7);
 
   const [wordToGuess, setWordToGuess] = useState("");
@@ -21,17 +23,10 @@ export default function Hangman() {
   const resetWord = useCallback(() => {
     setGuessedLetters([]);
     fetchWord(level).then((response) => {
-      console.log(response.data);
+      // console.log(response.data);
       setWordToGuess(response.data[0].word);
     });
   }, [level]);
-
-  // const resetWord = () => {
-  //   // setGuessedLetters([]);
-  //   fetchWord(level).then((response) => {
-  //     setWordToGuess(response.data[0].word);
-  //   });
-  // };
 
   useEffect(() => {
     resetWord();
@@ -80,10 +75,12 @@ export default function Hangman() {
   // Events for lose and win modals
   const onLose = () => {
     resetWord();
+    if (streak) setStreak(0);
   };
 
   const onWin = () => {
     resetWord();
+    setStreak(streak + 1);
   };
 
   return (
