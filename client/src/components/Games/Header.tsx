@@ -6,7 +6,6 @@ import { SoloContext } from "../../Context";
 export default function GamesHeader() {
   const { level, setLevel, streak, setStreak } = useContext(SoloContext);
 
-  // TODO: use context to store level data
   const onChange = (event: any) => {
     if (!streak) setLevel(event.target.value);
     else if (
@@ -18,7 +17,7 @@ export default function GamesHeader() {
   };
 
   return (
-    <div className="w-screen flex">
+    <div className="w-screen flex justify-between">
       <Link to="..">Home</Link>
 
       <label htmlFor="level-select">Level:</label>
@@ -33,6 +32,7 @@ export default function GamesHeader() {
         <option value="b1">b1</option>
       </select>
       <p>Streak: {streak}</p>
+      <Link to="../m">Multiplayer</Link>
     </div>
   );
 }
