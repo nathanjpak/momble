@@ -4,7 +4,7 @@ export default function MultiplayerIndex() {
   return (
     <div>
       <Link to="create">Create new Room</Link>
-      <Link to="">Join Room</Link>
+      <Link to="join">Join Room</Link>
     </div>
   );
 }
