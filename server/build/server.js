@@ -3,19 +3,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios = require("axios");
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const config_1 = require("./config/config");
 const Logging_1 = __importDefault(require("./library/Logging"));
+const socket_io_1 = require("socket.io");
+const config_1 = require("./config/config");
+const private_rooms_1 = __importDefault(require("./handlers/private-rooms"));
 // Routes
-const clientRoutes = require("./routes/Client");
 const wordRoutes = require("./routes/Word");
-// Models
-const Word = require("./models/Word");
 // Data
-const wordData = require("../data/words.json");
+// const wordData = require("../data/words.json");
 const router = (0, express_1.default)();
 // Connect to Mongo
 mongoose_1.default
@@ -51,11 +49,6 @@ const StartServer = () => {
     });
     // Routes
     router.use('/api', wordRoutes);
-    // router.use(express.static(path.join(__dirname, "../../client/build")))
-    // router.get('*', (req, res, next) => {
-    //   res.sendFile(path.resolve(__dirname, "../../client/build", "index.html"))
-    // })
-    // router.use("/", clientRoutes);
     // Healthcheck
     router.get("/ping", (req, res, next) => res.status(200).json({ message: "pong" }));
     router.get("/", (req, res, next) => res.status(200).send("Hello"));
@@ -65,6 +58,19 @@ const StartServer = () => {
         Logging_1.default.error(error);
         return res.status(404).json({ message: error.message });
     });
-    http_1.default.createServer(router).listen(config_1.config.server.port, () => Logging_1.default.info(`Server is running on port ${config_1.config.server.port}`));
+    const httpServer = http_1.default.createServer(router).listen(config_1.config.server.port, () => Logging_1.default.info(`Server is running on port ${config_1.config.server.port}`));
+    // Setup web socket
+    const io = new socket_io_1.Server(httpServer, {
+        cors: {
+            origin: "http://localhost:3000"
+        }
+    });
+    io.on("connection", (socket) => {
+        console.log('User Connected: ', socket.id);
+        (0, private_rooms_1.default)(io, socket);
+        socket.on("disconnect", () => {
+            console.log('User disconnected: ', socket.id);
+        });
+    });
     console.log("Finished!");
 };

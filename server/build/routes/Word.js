@@ -7,9 +7,6 @@ const express_1 = __importDefault(require("express"));
 const Word = require("../models/Word");
 const router = express_1.default.Router();
 // GET random word(s)
-// router.get("/", (req, res) => {
-// });
-// GET random word(s)
 router.get("/:level", (req, res) => {
     const level = req.params.level;
     let count = Number(req.query.count);

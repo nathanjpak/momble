@@ -1,23 +1,17 @@
-const axios = require("axios");
-
-import e from "express";
-import * as path from "path";
-
 import express from "express";
 import http from "http";
 import mongoose from "mongoose";
-import { config } from "./config/config";
 import Logging from "./library/Logging";
+import { Server } from "socket.io";
+
+import { config } from "./config/config";
+import registerPrivateRoomHandlers from "./handlers/private-rooms";
 
 // Routes
-const clientRoutes = require("./routes/Client");
 const wordRoutes = require("./routes/Word");
 
-// Models
-const Word = require("./models/Word");
-
 // Data
-const wordData = require("../data/words.json");
+// const wordData = require("../data/words.json");
 
 const router = express();
 
@@ -64,12 +58,6 @@ const StartServer = () => {
   // Routes
   router.use('/api', wordRoutes);
 
-  // router.use(express.static(path.join(__dirname, "../../client/build")))
-  // router.get('*', (req, res, next) => {
-  //   res.sendFile(path.resolve(__dirname, "../../client/build", "index.html"))
-  // })
-  // router.use("/", clientRoutes);
-
   // Healthcheck
   router.get("/ping", (req, res, next) => res.status(200).json({message: "pong"}));
 
@@ -83,10 +71,23 @@ const StartServer = () => {
     return res.status(404).json({ message: error.message });
   });
 
-  http.createServer(router).listen(config.server.port, () => Logging.info(`Server is running on port ${config.server.port}`));
+  const httpServer = http.createServer(router).listen(config.server.port, () => Logging.info(`Server is running on port ${config.server.port}`));
+
+  // Setup web socket
+  const io = new Server(httpServer, {
+    cors: {
+      origin: "http://localhost:3000"
+    }
+  });
+
+  io.on("connection", (socket) => {
+    console.log('User Connected: ', socket.id);
+    registerPrivateRoomHandlers(io, socket);
+
+    socket.on("disconnect", () => {
+      console.log('User disconnected: ', socket.id);
+    });
+  });
 
   console.log("Finished!");
 };
-
-
-

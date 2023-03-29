@@ -5,12 +5,6 @@ const Word = require("../models/Word");
 const router = express.Router();
 
 // GET random word(s)
-// router.get("/", (req, res) => {
-  
-// });
-
-
-// GET random word(s)
 router.get("/:level", (req, res) => {
   const level = req.params.level;
   let count:number = Number(req.query.count);
