@@ -1,4 +1,5 @@
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 interface JoinCodeInput {
   code: String;
@@ -7,8 +8,10 @@ interface JoinCodeInput {
 export default function JoinMultiplayer() {
   const { register, handleSubmit } = useForm<JoinCodeInput>();
 
+  const navigate = useNavigate();
+
   const onCodeSubmit: SubmitHandler<JoinCodeInput> = (data) => {
-    console.log(data);
+    navigate("../test");
   };
 
   return (

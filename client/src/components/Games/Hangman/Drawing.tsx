@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { getRandNumbers } from "../../../util/functions";
 
 // individual parts of the drawing

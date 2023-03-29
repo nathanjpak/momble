@@ -9,6 +9,7 @@ import Hangman from "./components/Games/Hangman";
 import MultiplayerIndex from "./components/Multiplayer/CreateOrJoin";
 import CreateMultiplayer from "./components/Multiplayer/Create";
 import JoinMultiplayer from "./components/Multiplayer/Join";
+import TestGame from "./components/Multiplayer/Test";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -25,6 +26,7 @@ root.render(
           <Route index element={<MultiplayerIndex />} />
           <Route path="create" element={<CreateMultiplayer />} />
           <Route path="join" element={<JoinMultiplayer />} />
+          <Route path="test" element={<TestGame />} />
         </Route>
       </Routes>
     </BrowserRouter>
