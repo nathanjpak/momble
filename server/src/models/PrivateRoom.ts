@@ -1,33 +1,32 @@
-import { getModelForClass, prop } from "@typegoose/typegoose";
+import { getModelForClass, index, prop } from "@typegoose/typegoose";
 import mongoose from "mongoose";
 import { GameName, HangmanData } from "./Games";
 
+@index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 60 * 60 * 6 }
+)
 export class PrivateRoom {
   @prop()
   public _id!: string;
 
+  @prop({ default: Date.now })
+  public createdAt!: Date;
+
   @prop()
-  maxOccupany!: number;
+  public maxOccupany!: number;
 
   @prop({ enum: GameName })
-  game!: GameName;
+  public game!: GameName;
 
   @prop({ type: String, required: true, default: [] })
-  occupants!: mongoose.Types.Array<string>;
+  public occupants!: mongoose.Types.Array<string>;
 
   @prop({ default: false })
-  gameStart!: boolean;
+  public gameStart!: boolean;
 
   @prop({ type: HangmanData })
-  gameData!: HangmanData;
+  public gameData!: HangmanData;
 }
 
-export const PrivateRoomModel = getModelForClass(PrivateRoom, {
-  schemaOptions: {
-    capped: { 
-      size: 1024, 
-      max: 100, 
-      autoIndexId: false 
-    }
-  }
-});
+export const PrivateRoomModel = getModelForClass(PrivateRoom);
