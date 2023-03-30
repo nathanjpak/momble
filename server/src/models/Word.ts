@@ -1,5 +1,4 @@
 import { getModelForClass, prop } from "@typegoose/typegoose";
-import mongoose, {Schema} from "mongoose";
 
 export class Word {
   @prop({ type: String, required: true })
@@ -28,16 +27,3 @@ export class Word {
 }
 
 export const WordModel = getModelForClass(Word);
-
-// const WordSchema: Schema = new Schema({
-//   word: { type: String, required: true},  
-//   // Parts of speech include: noun, verb, adjective, adverb, preposition
-//   partOfSpeech: { type: String, required: true },
-//   definition: { type: String },
-//   // Levels include a1, a2
-//   level: [{ type: String }]
-// }, {
-//   versionKey: false
-// });
-
-// module.exports = mongoose.model("Word", WordSchema);

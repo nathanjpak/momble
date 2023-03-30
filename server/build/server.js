@@ -12,6 +12,7 @@ const config_1 = require("./config/config");
 const private_rooms_1 = __importDefault(require("./handlers/private-rooms"));
 // Routes
 const wordRoutes = require("./routes/Word");
+const roomRoutes = require("./routes/Room");
 // Data
 // const wordData = require("../data/words.json");
 const router = (0, express_1.default)();
@@ -49,6 +50,7 @@ const StartServer = () => {
     });
     // Routes
     router.use('/api', wordRoutes);
+    router.use('/rooms', roomRoutes);
     // Healthcheck
     router.get("/ping", (req, res, next) => res.status(200).json({ message: "pong" }));
     router.get("/", (req, res, next) => res.status(200).send("Hello"));

@@ -9,6 +9,7 @@ import registerPrivateRoomHandlers from "./handlers/private-rooms";
 
 // Routes
 const wordRoutes = require("./routes/Word");
+const roomRoutes = require("./routes/Room")
 
 // Data
 // const wordData = require("../data/words.json");
@@ -57,6 +58,7 @@ const StartServer = () => {
 
   // Routes
   router.use('/api', wordRoutes);
+  router.use('/rooms', roomRoutes);
 
   // Healthcheck
   router.get("/ping", (req, res, next) => res.status(200).json({message: "pong"}));

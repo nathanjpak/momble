@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import ShortUniqueId from "short-unique-id";
-import PrivateRoom from "../models/PrivateRoom";
+import { PrivateRoomModel } from "../models/PrivateRoom";
 import { MongooseError } from "mongoose";
 
 const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
@@ -10,29 +10,30 @@ const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
       maxOccupancy = data.maxOccupancy || 2,
       game = data.game;
 
-    const room = new PrivateRoom({
+    const room = new PrivateRoomModel({
       _id: roomId,
-      maxOccupancy: maxOccupancy,
-      game: game,
-      occupants: [socket.id],
+      maxOccupany: maxOccupancy,
+      game: game
     });
 
     room.save();
 
     socket.join(roomId);
+    console.log(`User ${socket.id} joined room ${roomId}`);
   };
 
   const joinRoom = async (socket:Socket, roomId:string) => {
-    const room = await PrivateRoom.findOneAndUpdate({ _id: roomId }, {
+    const room = await PrivateRoomModel.findOneAndUpdate({ _id: roomId }, {
       $push: {
         "occupants": socket.id
       }
-    }, (err: MongooseError, room: any) => {
+    }, (err: MongooseError, res: any ) => {
       if (err) {
         socket.emit("There was an error joining the room.");
         console.log(err);
       } else {
-        socket.join(room._id);
+        socket.join(room!._id);
+        console.log(res);
       }
     });
   };
