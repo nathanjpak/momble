@@ -10,6 +10,7 @@ const Logging_1 = __importDefault(require("./library/Logging"));
 const socket_io_1 = require("socket.io");
 const config_1 = require("./config/config");
 const private_rooms_1 = __importDefault(require("./handlers/private-rooms"));
+const hangman_1 = __importDefault(require("./handlers/hangman"));
 // Routes
 const wordRoutes = require("./routes/Word");
 const roomRoutes = require("./routes/Room");
@@ -70,6 +71,7 @@ const StartServer = () => {
     io.on("connection", (socket) => {
         console.log('User Connected: ', socket.id);
         (0, private_rooms_1.default)(io, socket);
+        (0, hangman_1.default)(io, socket);
         socket.on("disconnect", () => {
             console.log('User disconnected: ', socket.id);
         });

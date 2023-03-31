@@ -3,7 +3,6 @@ import { PrivateRoomModel } from "../models/PrivateRoom";
 
 const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
   const joinRoom = async (roomId:string, callback: (res: any) => void) => {
-    console.log(roomId);
     
     const [err, room] = await PrivateRoomModel.findOne({ _id: roomId })
       .then(room => ([null, room]), err => ([err, null]));
@@ -25,9 +24,11 @@ const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
     room.occupants[emptySpotInRoom] = socket.id;
     await room.save().then(() => {
       socket.join(roomId);
-      socket.emit(`Joined room ${room._id}`);
+      socket.to(roomId).emit('private-room:update', {
+        msg: `User ${socket.id} joined the room.`,
+        data: room
+      });
       callback(room);
-      console.log('current rooms: ', socket.rooms);
     });
   };
 
@@ -42,9 +43,12 @@ const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
 
         const spotToBeVacated = room.occupants.indexOf(socket.id);
         room.occupants[spotToBeVacated] = null;
-        
+
         await room.save().then(() => {
-          console.log('User left room: ', room._id);
+          socket.to(room._id).emit('private-room:update', {
+            msg: `User ${socket.id} left the room.`,
+            data: room
+          });
         });
       };
     });

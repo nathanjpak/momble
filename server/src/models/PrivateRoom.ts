@@ -1,5 +1,4 @@
 import { getModelForClass, index, prop } from "@typegoose/typegoose";
-import mongoose from "mongoose";
 import { GameName, HangmanData } from "./Games";
 
 @index(

@@ -6,6 +6,7 @@ import { Server } from "socket.io";
 
 import { config } from "./config/config";
 import registerPrivateRoomHandlers from "./handlers/private-rooms";
+import registerHangmanHandlers from "./handlers/hangman";
 
 // Routes
 const wordRoutes = require("./routes/Word");
@@ -85,6 +86,7 @@ const StartServer = () => {
   io.on("connection", (socket) => {
     console.log('User Connected: ', socket.id);
     registerPrivateRoomHandlers(io, socket);
+    registerHangmanHandlers(io, socket);
 
     socket.on("disconnect", () => {
       console.log('User disconnected: ', socket.id);
