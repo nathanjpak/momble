@@ -32,7 +32,7 @@ export default function GamesHeader() {
         <option value="b1">b1</option>
       </select>
       <p>Streak: {streak}</p>
-      <Link to="../m">Multiplayer</Link>
+      <Link to="../r">Multiplayer</Link>
     </div>
   );
 }

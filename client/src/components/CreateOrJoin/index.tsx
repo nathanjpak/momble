@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function MultiplayerIndex() {
+export default function CreateOrJoin() {
   return (
     <div>
       <Link to="create">Create new Room</Link>

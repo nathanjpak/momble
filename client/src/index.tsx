@@ -6,10 +6,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import App from "./App";
 import GamesPage from "./components/Games";
 import Hangman from "./components/Games/Hangman";
-import MultiplayerIndex from "./components/Multiplayer/CreateOrJoin";
-import CreateMultiplayer from "./components/Multiplayer/Create";
-import JoinMultiplayer from "./components/Multiplayer/Join";
+import CreateMultiplayer from "./components/CreateOrJoin/Create";
+import JoinMultiplayer from "./components/CreateOrJoin/Join";
 import TestGame from "./components/Multiplayer/Test";
+import CreateOrJoin from "./components/CreateOrJoin";
+import GamesRoomPage from "./components/Multiplayer";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -23,10 +24,13 @@ root.render(
           <Route path="hangman" element={<Hangman />} />
         </Route>
         <Route path="/m">
-          <Route index element={<MultiplayerIndex />} />
+          <Route path="test" element={<TestGame />} />
+          <Route path=":roomId" element={<GamesRoomPage />} />
+        </Route>
+        <Route path="/r">
+          <Route index element={<CreateOrJoin />} />
           <Route path="create" element={<CreateMultiplayer />} />
           <Route path="join" element={<JoinMultiplayer />} />
-          <Route path="test" element={<TestGame />} />
         </Route>
       </Routes>
     </BrowserRouter>

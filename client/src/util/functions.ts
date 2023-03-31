@@ -22,6 +22,14 @@ export function fetchWord(
   });
 }
 
+export function postRoom(data: any): Promise<any> {
+  return axios({
+    method: "post",
+    url: `${rootUrl}/rooms`,
+    data: data,
+  });
+}
+
 // Misc functions
 export function getRandNumbers(
   // Max exclusive, min inclusive
