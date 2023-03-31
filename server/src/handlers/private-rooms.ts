@@ -1,45 +1,57 @@
 import { Server, Socket } from "socket.io";
-import ShortUniqueId from "short-unique-id";
 import { PrivateRoomModel } from "../models/PrivateRoom";
-import { MongooseError } from "mongoose";
 
 const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
-  const createRoom = (socket:Socket, data: any) => {
-    const uid = new ShortUniqueId({length: 6});
-    const roomId = uid(),
-      maxOccupancy = data.maxOccupancy || 2,
-      game = data.game;
+  const joinRoom = async (roomId:string, callback: (res: any) => void) => {
+    console.log(roomId);
+    
+    const [err, room] = await PrivateRoomModel.findOne({ _id: roomId })
+      .then(room => ([null, room]), err => ([err, null]));
 
-    const room = new PrivateRoomModel({
-      _id: roomId,
-      maxOccupany: maxOccupancy,
-      game: game
+    if (err) {
+      socket.emit(`Could not find room.`);
+      console.log(err);
+      return
+    }
+
+    if (room.occupants.includes(socket.id)) return;
+    const emptySpotInRoom = room.occupants.indexOf(null);
+
+    if (emptySpotInRoom === -1) {
+      callback('Room is full.');
+      return
+    }
+
+    room.occupants[emptySpotInRoom] = socket.id;
+    await room.save().then(() => {
+      socket.join(roomId);
+      socket.emit(`Joined room ${room._id}`);
+      callback(room);
+      console.log('current rooms: ', socket.rooms);
     });
-
-    room.save();
-
-    socket.join(roomId);
-    console.log(`User ${socket.id} joined room ${roomId}`);
   };
 
-  const joinRoom = async (socket:Socket, roomId:string) => {
-    const room = await PrivateRoomModel.findOneAndUpdate({ _id: roomId }, {
-      $push: {
-        "occupants": socket.id
-      }
-    }, (err: MongooseError, res: any ) => {
-      if (err) {
-        socket.emit("There was an error joining the room.");
-        console.log(err);
-      } else {
-        socket.join(room!._id);
-        console.log(res);
-      }
+  const leaveRoom = async () => {
+    const roomList = socket.rooms;
+    roomList.forEach(async (id) => {
+      if (id !== socket.id) {
+        const [err, room] = await PrivateRoomModel.findOne({ _id: id })
+          .then(room => ([null, room]), err => ([err, null]));
+        
+        if (err) return;
+
+        const spotToBeVacated = room.occupants.indexOf(socket.id);
+        room.occupants[spotToBeVacated] = null;
+        
+        await room.save().then(() => {
+          console.log('User left room: ', room._id);
+        });
+      };
     });
   };
   
-  socket.on("private-room:create", createRoom);
   socket.on("private-room:join", joinRoom);
+  socket.on("disconnecting", leaveRoom);
 };
 
 export default registerPrivateRoomHandlers;

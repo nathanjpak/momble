@@ -1,5 +1,6 @@
 import express from "express";
 import ShortUniqueId from "short-unique-id";
+import { HangmanData } from "../models/Games";
 
 import { PrivateRoomModel } from "../models/PrivateRoom";
 
@@ -14,29 +15,30 @@ router.get("/:id", async (req, res) => {
   }).then(room => ([null, room]), err => ([err, null]));
 
   if (err) res.send(err).end();
-  res.send(room).status(200);
+  res.status(200).send(room);
 });
 
 // POST room
 router.post("/", async (req, res) => {
   const data = req.body;
-  console.log(data);
 
-  const uid = new ShortUniqueId({length: 6});
+  const uid = new ShortUniqueId({length: 6, dictionary: "alphanum_upper"});
   const roomId = uid(),
-    maxOccupany = data.maxOccupancy,
+    maxOccupancy = data.maxOccupancy,
     game = data.game;
+
+  const gameData = new HangmanData();
 
   const room = new PrivateRoomModel({
     _id: roomId,
-    maxOccupany: maxOccupany,
-    game: game
+    maxOccupancy: maxOccupancy,
+    game: game,
+    gameData: gameData
   });
 
   const [err, newRoom] = await room.save().then(newRoom => ([null, newRoom]), err => ([err, null]));
 
-  if (err) res.send(err).end();
-  res.send(newRoom).status(200);
+  (err) ? res.send(err).end() : res.status(200).send(newRoom);
 });
 
 module.exports = router;
