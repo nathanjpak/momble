@@ -12,22 +12,18 @@ router.get("/:level", async (req, res) => {
   let min:number = Number(req.query.min);
   if (!min) min = 4;
 
-  const [err, result] = await WordModel.aggregate(
-    [ 
-      { $match: { level: level } },
-      { $redact: {
-        $cond: [
-          { $gt: [ { $strLenCP: "$word" }, min ] },
-          "$$KEEP",
-          "$$PRUNE"
-        ]
-      } },
-      { $sample: { size: count } } 
-    ]
-  ).exec();
+  const [err, result] = await WordModel.aggregate()
+    .match({ level: level })
+    .redact({ $gt: [ { "$strLenCP": "$word" }, min ] }, "$$KEEP", "$$PRUNE")
+    .sample(count)
+    .exec()
+    .then(result => ([null, result]), err => ([err, null]))
 
-  if (err) res.send(err).end();
-  res.send(result).status(200);
+  if (err) {
+    res.send(err).end();
+  } else {
+    res.status(200).send(result);
+  }
 });
 
 module.exports = router;

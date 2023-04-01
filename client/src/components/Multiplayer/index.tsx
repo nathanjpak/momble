@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import socket from "../../socket";
 import EnterName from "./EnterName";
+import HangmanMultiplayer from "./Hangman";
 import MultiplayerHeader from "./Header";
 
 export class RoomData {
@@ -23,27 +24,37 @@ export class RoomData {
 export default function GamesRoomPage() {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [roomData, setRoomData] = useState(new RoomData());
+  const [joinedGame, setJoinedGame] = useState(false);
+  const [gameData, setGameData] = useState({});
 
   const { roomId } = useParams();
 
   useEffect(() => {
+    // Could move these to a separate file
     const onConnect = () => {
       setIsConnected(true);
     };
 
     const onDisconnect = () => {
       setIsConnected(false);
+      setJoinedGame(false);
     };
 
     const roomUpdateListener = (response: any) => {
-      console.log(response.msg);
-      console.log(response);
       setRoomData(response.data);
+    };
+
+    const gameUpdateListener = (gameData: any) => {
+      if (!joinedGame) {
+        if (gameData.players[socket.id]) setJoinedGame(true);
+      }
+      setGameData(gameData);
     };
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("private-room:update", roomUpdateListener);
+    socket.on("update-game", gameUpdateListener);
 
     socket.connect();
     socket.emit("private-room:join", roomId, (roomData: RoomData) => {
@@ -55,6 +66,7 @@ export default function GamesRoomPage() {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("private-room:update", roomUpdateListener);
+      socket.off("update-game", gameUpdateListener);
     };
   }, []);
 
@@ -62,7 +74,13 @@ export default function GamesRoomPage() {
     <>
       {roomData?._id && <MultiplayerHeader game={roomData.game} />}
       {isConnected && <p>Connected.</p>}
-      {roomData?._id && <EnterName />}
+      {roomData?._id && !joinedGame && <EnterName game={roomData.game} />}
+      {joinedGame && (
+        <HangmanMultiplayer
+          gameData={gameData}
+          occupants={roomData.occupants}
+        />
+      )}
     </>
   );
 }

@@ -1,21 +1,26 @@
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import socket from "../../socket";
+import { HangmanPlayer } from "./types";
 
-export default function EnterName() {
+export default function EnterName({ game }: { game: string }) {
   const { register, handleSubmit } = useForm();
 
-  const roomId = useParams();
+  const { roomId } = useParams();
 
   const onSubmit = async (data: any) => {
-    socket.emit("private-rooms:game-update", data.name);
+    const player = new HangmanPlayer(data.name, 0, true);
+
+    console.log(player);
+
+    socket.emit(`${game}:update-player`, roomId, player);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <p>Enter your name:</p>
       <input {...register("name")} type="text" />
-      <button type="submit">Submit</button>
+      <button type="submit">Join Game</button>
     </form>
   );
 }

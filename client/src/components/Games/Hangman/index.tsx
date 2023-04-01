@@ -23,7 +23,7 @@ export default function Hangman() {
   const resetWord = useCallback(() => {
     setGuessedLetters([]);
     fetchWord(level).then((response) => {
-      // console.log(response.data);
+      console.log(response.data);
       setWordToGuess(response.data[0].word);
     });
   }, [level]);

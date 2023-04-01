@@ -44,8 +44,10 @@ const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
         const spotToBeVacated = room.occupants.indexOf(socket.id);
         room.occupants[spotToBeVacated] = null;
 
+        if (room.gameStart) room.gameStart = false;
+
         await room.save().then(() => {
-          socket.to(room._id).emit('private-room:update', {
+          io.to(room._id).emit('private-room:update', {
             msg: `User ${socket.id} left the room.`,
             data: room
           });
