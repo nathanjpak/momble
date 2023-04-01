@@ -39,12 +39,14 @@ const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
         const [err, room] = await PrivateRoomModel.findOne({ _id: id })
           .then(room => ([null, room]), err => ([err, null]));
         
-        if (err) return;
+        if (err || !room) return;
 
         const spotToBeVacated = room.occupants.indexOf(socket.id);
         room.occupants[spotToBeVacated] = null;
 
         if (room.gameStart) room.gameStart = false;
+
+        delete room.gameData.players[socket.id];  
 
         await room.save().then(() => {
           io.to(room._id).emit('private-room:update', {

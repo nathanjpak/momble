@@ -34,9 +34,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
         room.gameStart = !room.gameStart;
         gameStateChanged = true;
         if (room.gameStart) {
-          const word = await getWords({ level: "a1", count: 1, min: 5 });
-          if (word) room.gameData.word = word[0].word;
-          console.log(word);
+          await startGame(room);
         } else {
           room.gameData.word = "";
         }
@@ -53,6 +51,33 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
       if (gameStateChanged) io.to(roomId).emit("private-room:update", {data: room});
     });
   };
+
+  const startGame = async (room: any, level = "a1") => {
+    room.gameStart = true;
+    const word = await getWords({ level: level, count: 1, min: 5 });
+    if (word) room.gameData.word = word[0].word;
+
+    const turnQueue = new Array(room.occupants.length * 3);
+
+    for (let index=0; index < room.occupants.length * 3; index++) {
+      const playerIndex = index % room.occupants.length;
+      turnQueue[index] = room.occupants[playerIndex];
+    };
+    
+    room.gameData.turnQueue = turnQueue;
+  }
+
+  // const handleTurn = async (roomId: string, guessedLetter: string) => {
+  //   const [err, room] = await PrivateRoomModel.findOne({ _id: roomId })
+  //     .then(room => ([null, room]), err => ([err, null]));
+    
+  //   if (err) {
+  //     io.emit("error", "There was an error retrieving data from the room.");
+  //     console.log(err);
+  //   }
+
+    
+  // }
 
   socket.on("hangman:update-player", updatePlayer);
 };

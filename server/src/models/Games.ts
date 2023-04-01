@@ -24,6 +24,9 @@ export class HangmanData {
     @prop({ enum: HangmanMode, default: HangmanMode.TRADITIONAL })
     public mode!: HangmanMode;
 
+    @prop({ type: String, required: true, default: [] })
+    public turnQueue!: Array<string>;
+
     @prop({ type: () => HangmanPlayer, _id: false, default: new Map<string, HangmanPlayer>})
     public players!: Map<string, HangmanPlayer>;
 }
@@ -35,8 +38,8 @@ export class HangmanPlayer {
   @prop({ default: 0 })
   public points!: number; 
 
-  @prop({ default: false })
-  public currentTurn!: boolean;
+  // @prop({ default: false })
+  // public currentTurn!: boolean;
 
   @prop({ default: false })
   public ready!: false;
