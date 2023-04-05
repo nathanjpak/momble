@@ -19,8 +19,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     }
 
     room.gameData.players.set(socket.id, playerData);
-
-    let gameStateChanged = false;
+    socket.data.gameRoom = roomId;
 
     // check if game needs to start or stop
     if (!room.occupants.includes(null)) {
@@ -28,32 +27,19 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
         return (room.gameData.players[id]?.ready === false);
       });
 
-      unreadyPlayer = (unreadyPlayer) ? true : false;
-
-      if (unreadyPlayer === room.gameStart) {
-        room.gameStart = !room.gameStart;
-        gameStateChanged = true;
-        if (room.gameStart) {
-          await startGame(room);
-        } else {
-          room.gameData.word = "";
-        }
-      }
-    } else if (room.gameStart) {
-      room.gameStart = false;
+      if (!unreadyPlayer && room.gameData.word === "") {
+        await startGame(room);
+      };
+    } else {
       room.gameData.word = "";
-      gameStateChanged = true;
     }
-
     await room.save().then(() => {
       io.to(roomId).emit("update-game", room.gameData);
       console.log('Game updated.');
-      if (gameStateChanged) io.to(roomId).emit("private-room:update", {data: room});
     });
   };
 
   const startGame = async (room: any, level = "a1") => {
-    room.gameStart = true;
     const word = await getWords({ level: level, count: 1, min: 5 });
     if (word) room.gameData.word = word[0].word;
 
@@ -67,19 +53,81 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     room.gameData.turnQueue = turnQueue;
   }
 
-  // const handleTurn = async (roomId: string, guessedLetter: string) => {
-  //   const [err, room] = await PrivateRoomModel.findOne({ _id: roomId })
-  //     .then(room => ([null, room]), err => ([err, null]));
+  const handleWin = async (room: any, word: string, correctLetters: string[]) => {
+    let points = (word.length - correctLetters.length) * 10;
+    if (points > 100) points = 100;
     
-  //   if (err) {
-  //     io.emit("error", "There was an error retrieving data from the room.");
-  //     console.log(err);
-  //   }
+    room.gameData.players[socket.id].points += points;
+    room.gameData.word = "";
 
+    await room.save();
+
+    io.to(room._id).emit("game-over", {
+      winner: socket.id,
+      word: word,
+      data: room.gameData
+    });
+  };
+
+  const handleTurn = async (roomId: string, guess: string) => {
+    const [err, room] = await PrivateRoomModel.findOne({ _id: roomId })
+      .then(room => ([null, room]), err => ([err, null]));
     
-  // }
+    if (err) {
+      io.emit("error", "There was an error retrieving data from the room.");
+      console.log(err);
+    }
+
+    const isWord = (guess.length > 1)
+
+    if (!isWord) room.gameData.guessedLetters.push(guess);
+
+    const isCorrect = isWord ? 
+      guess === room.gameData.word : room.gameData.word.includes(guess);
+
+    if (isCorrect) {
+      if (isWord)
+        return handleWin(room, room.gameData.word, room.gameData.correctLetters);
+      room.gameData.correctLetters.push(guess);
+      if (room.gameData.correctLetters.length === room.gameData.word.length)
+        return handleWin(room, room.gameData.word, room.gameData.correctLetters);
+    }
+
+    room.gameData.turnQueue.shift();
+    room.gameData.turnQueue.push(socket.id);
+
+    if (!isCorrect) {
+      if (isWord) {
+        let skippedTurn = false;
+        const newQueue = room.gameData.turnQueue.reduce((acc: string[], curr: string) => {
+          if (!skippedTurn && curr === socket.id) {
+            skippedTurn = true;
+            return acc;
+          }
+          acc.push(curr);
+          return acc;
+        }, []);
+        room.gameData.turnQueue = newQueue;
+      }
+    }
+
+    await room.save().then(() => {
+      io.to(roomId).emit("updateGame", room.gameData);
+      console.log("Game updated.");
+    });
+  }
+
+  const handleDisconnect = async () => {
+    if (socket.data.gameRoom) {
+      const room = await PrivateRoomModel.findOne( {_id: socket.data.gameRoom} );
+      room?.gameData.players.delete(socket.id);
+      await room?.save();
+    }
+  };
 
   socket.on("hangman:update-player", updatePlayer);
+  socket.on("hangman:play-turn", handleTurn);
+  socket.on("disconnect", handleDisconnect);
 };
 
 export default registerHangmanHandlers;

@@ -21,6 +21,9 @@ export class HangmanData {
     @prop({ type: String, required: true, default: [] })
     public guessedLetters!: mongoose.Types.Array<String>;
 
+    @prop({ type: String, required: true, default: [] })
+    public correctLetters!: mongoose.Types.Array<String>;
+
     @prop({ enum: HangmanMode, default: HangmanMode.TRADITIONAL })
     public mode!: HangmanMode;
 

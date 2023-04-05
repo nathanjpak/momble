@@ -39,7 +39,11 @@ const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
         const [err, room] = await PrivateRoomModel.findOne({ _id: id })
           .then(room => ([null, room]), err => ([err, null]));
         
-        if (err || !room) return;
+        if (err) return;
+        if (null) {
+          io.to(room._id).emit('error', 'Could not find room with that id.')
+          return;
+        }
 
         const spotToBeVacated = room.occupants.indexOf(socket.id);
         room.occupants[spotToBeVacated] = null;

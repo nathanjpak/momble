@@ -21,9 +21,6 @@ export class PrivateRoom {
   @prop({ type: String, required: true, default: [null, null] })
   public occupants!: Array<string | null>;
 
-  @prop({ default: false })
-  public gameStart!: boolean;
-
   @prop({ type: HangmanData })
   public gameData!: HangmanData;
 
