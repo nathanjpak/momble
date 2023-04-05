@@ -112,7 +112,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     }
 
     await room.save().then(() => {
-      io.to(roomId).emit("updateGame", room.gameData);
+      io.to(roomId).emit("update-game", room.gameData);
       console.log("Game updated.");
     });
   }
@@ -121,7 +121,9 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     if (socket.data.gameRoom) {
       const room = await PrivateRoomModel.findOne( {_id: socket.data.gameRoom} );
       room?.gameData.players.delete(socket.id);
-      await room?.save();
+      await room?.save().then(() => {
+        io.to(room._id).emit("update-game", room.gameData);
+      });
     }
   };
 
