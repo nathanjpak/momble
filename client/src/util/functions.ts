@@ -30,6 +30,13 @@ export function postRoom(data: any): Promise<any> {
   });
 }
 
+export function fetchRoom(code: string): Promise<any> {
+  return axios({
+    method: "get",
+    url: `${rootUrl}/rooms/${code}`,
+  });
+}
+
 // Misc functions
 export function getRandNumbers(
   // Max exclusive, min inclusive
