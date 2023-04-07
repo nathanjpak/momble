@@ -41,8 +41,8 @@ export class HangmanPlayer {
   @prop({ default: 0 })
   public points!: number; 
 
-  // @prop({ default: false })
-  // public currentTurn!: boolean;
+  @prop({ default: false })
+  public skipTurn!: boolean;
 
   @prop({ default: false })
   public ready!: false;

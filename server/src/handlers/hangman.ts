@@ -85,6 +85,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     const isCorrect = isWord ? 
       guess === room.gameData.word : room.gameData.word.includes(guess);
 
+
     if (isCorrect) {
       if (isWord)
         return handleWin(room, room.gameData.word, room.gameData.correctLetters);
@@ -96,19 +97,19 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     room.gameData.turnQueue.shift();
     room.gameData.turnQueue.push(socket.id);
 
-    if (!isCorrect) {
-      if (isWord) {
-        let skippedTurn = false;
-        const newQueue = room.gameData.turnQueue.reduce((acc: string[], curr: string) => {
-          if (!skippedTurn && curr === socket.id) {
-            skippedTurn = true;
-            return acc;
-          }
-          acc.push(curr);
-          return acc;
-        }, []);
-        room.gameData.turnQueue = newQueue;
-      }
+    const nextPlayerId = room.gameData.turnQueue[0];
+    let nextPlayer = room.gameData.players.get(nextPlayerId);
+
+    while (nextPlayer.skipTurn) {
+      nextPlayer.skipTurn = false;
+      room.gameData.turnQueue.push(nextPlayerId);
+      room.gameData.turnQueue.shift();
+      nextPlayer = room.gameData.players.get(nextPlayerId);
+    }
+
+    if (!isCorrect && isWord) {
+      const currentPlayer = room.gameData.players.get(socket.id);
+      currentPlayer.skipTurn = true;
     }
 
     await room.save().then(() => {
