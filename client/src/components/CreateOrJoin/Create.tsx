@@ -6,17 +6,17 @@ enum Game {
   hangman = "hangman",
 }
 
-interface MultiplayerInput {
+interface IMultiplayerInput {
   game: Game;
   maxOccupancy: number;
 }
 
 export default function CreateMultiplayer() {
-  const { register, handleSubmit } = useForm<MultiplayerInput>();
+  const { register, handleSubmit } = useForm<IMultiplayerInput>();
 
   const navigate = useNavigate();
 
-  const onSubmit: SubmitHandler<MultiplayerInput> = async (data) => {
+  const onSubmit: SubmitHandler<IMultiplayerInput> = async (data) => {
     await postRoom(data).then((response) => {
       const roomId = response.data._id;
       const urlString = `../../m/${roomId}`;

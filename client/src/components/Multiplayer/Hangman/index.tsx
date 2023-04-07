@@ -2,9 +2,10 @@ import Players from "./Players";
 import { nanoid } from "nanoid";
 import HangmanWord from "../../Games/Hangman/Word";
 import HangmanKeyboard from "../../Games/Hangman/Keyboard";
+import { useParams } from "react-router-dom";
 import socket from "../../../socket";
 import { useCallback, useState } from "react";
-import { useParams } from "react-router-dom";
+import HangmanWordInput from "./WordInput";
 
 export default function HangmanMultiplayer({
   gameData,
@@ -13,7 +14,7 @@ export default function HangmanMultiplayer({
   gameData: any;
   occupants: Array<string | null>;
 }) {
-  const [wordToGuess] = useState(gameData.word);
+  const wordToGuess = gameData.word;
   const userId = socket.id;
   const { roomId } = useParams();
   const currentTurn = gameData.turnQueue[0] === userId;
@@ -31,13 +32,15 @@ export default function HangmanMultiplayer({
     <div>
       {occupants.map((id) => {
         const playerData = id ? gameData?.players[id] : null;
+        const isUser = id === userId;
+
         if (playerData)
           return (
             <Players
               key={nanoid()}
               name={playerData.name}
               points={playerData.points}
-              currentTurn={currentTurn}
+              currentTurn={currentTurn && isUser}
               ready={playerData.ready}
             />
           );
@@ -50,7 +53,7 @@ export default function HangmanMultiplayer({
         />
       </div>
       <HangmanKeyboard
-        disabled={currentTurn}
+        disabled={!currentTurn}
         activeLetters={gameData.correctLetters}
         inactiveLetters={gameData.guessedLetters.filter((letter: string) => {
           return !wordToGuess.includes(letter);
@@ -58,6 +61,7 @@ export default function HangmanMultiplayer({
         addGuessedLetter={handleGuess}
         resetWord={() => {}}
       />
+      <HangmanWordInput handleGuess={handleGuess} />
     </div>
   );
 }
