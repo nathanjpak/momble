@@ -41,7 +41,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
 
   const startGame = async (room: any, level = "a1") => {
     const word = await getWords({ level: level, count: 1, min: 5 });
-    if (word) room.gameData.word = word[0].word;
+    if (word) room.gameData.word = word[0].word.toLowerCase();
 
     const turnQueue = new Array(room.occupants.length * 3);
 
@@ -57,7 +57,9 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     let points = (word.length - correctLetters.length) * 10;
     if (points > 100) points = 100;
     
-    room.gameData.players[socket.id].points += points;
+    const winner = room.gameData.players.get(socket.id);
+
+    winner.points += points;
     room.gameData.word = "";
 
     await room.save();
@@ -69,7 +71,9 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     });
   };
 
-  const handleTurn = async (roomId: string, guess: string) => {
+  const handleTurn = async (roomId: string, sensitiveGuess: string) => {
+    const guess = sensitiveGuess.toLowerCase();
+
     const [err, room] = await PrivateRoomModel.findOne({ _id: roomId })
       .then(room => ([null, room]), err => ([err, null]));
     
