@@ -1,7 +1,3 @@
-import React from "react";
-
-// const testWord = "reallybigword";
-
 type HangmanWordProps = {
   wordToGuess: string;
   guessedLetters: string[];
