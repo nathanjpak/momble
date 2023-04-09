@@ -2,6 +2,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 
 type HangmanWordInputProps = {
   handleGuess: (guess: string) => void;
+  currentTurn: boolean;
 };
 
 interface IWordInput {
@@ -10,6 +11,7 @@ interface IWordInput {
 
 export default function HangmanWordInput({
   handleGuess,
+  currentTurn,
 }: HangmanWordInputProps) {
   const { register, handleSubmit } = useForm<IWordInput>();
 
@@ -20,8 +22,10 @@ export default function HangmanWordInput({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <p>Think you know the word?</p>
-      <input type="text" {...register("guess")} />
-      <button type="submit">Try your luck!</button>
+      <input disabled={!currentTurn} type="text" {...register("guess")} />
+      <button disabled={!currentTurn} type="submit">
+        Try your luck!
+      </button>
     </form>
   );
 }

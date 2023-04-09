@@ -73,7 +73,6 @@ export default function GamesRoomPage() {
   return (
     <>
       {roomData?._id && <MultiplayerHeader game={roomData.game} />}
-      {isConnected && <p>Connected.</p>}
       {roomData?._id && !joinedGame && <EnterName game={roomData.game} />}
       {joinedGame && (
         <HangmanMultiplayer

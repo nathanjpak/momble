@@ -4,7 +4,7 @@ import HangmanWord from "../../Games/Hangman/Word";
 import HangmanKeyboard from "../../Games/Hangman/Keyboard";
 import { useParams } from "react-router-dom";
 import socket from "../../../socket";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import HangmanWordInput from "./WordInput";
 
 export default function HangmanMultiplayer({
@@ -61,7 +61,7 @@ export default function HangmanMultiplayer({
         addGuessedLetter={handleGuess}
         resetWord={() => {}}
       />
-      <HangmanWordInput handleGuess={handleGuess} />
+      <HangmanWordInput handleGuess={handleGuess} currentTurn={currentTurn} />
     </div>
   );
 }
