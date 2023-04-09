@@ -13,7 +13,7 @@ export class PrivateRoom {
   public createdAt!: Date;
 
   @prop()
-  public maxOccupancy: number;
+  public maxOccupancy!: number;
 
   @prop({ enum: GameName })
   public game!: GameName;
@@ -23,12 +23,6 @@ export class PrivateRoom {
 
   @prop({ type: HangmanData })
   public gameData!: HangmanData;
-
-  constructor(maxOccupancy: number) {
-    this.maxOccupancy = maxOccupancy;
-    const occupants = new Array<string | null>(maxOccupancy).fill(null);
-    this.occupants = occupants;
-  };
 }
 
 export const PrivateRoomModel = getModelForClass(PrivateRoom);

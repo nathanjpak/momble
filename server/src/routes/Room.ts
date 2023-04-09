@@ -27,14 +27,19 @@ router.post("/", async (req, res) => {
     maxOccupancy = data.maxOccupancy,
     game = data.game;
 
+  const occupants = Array.from({length: maxOccupancy}, () => null);
+
   const gameData = new HangmanData();
 
   const room = new PrivateRoomModel({
     _id: roomId,
     maxOccupancy: maxOccupancy,
     game: game,
+    occupants: occupants,
     gameData: gameData
   });
+
+  console.log(room);
 
   const [err, newRoom] = await room.save().then(newRoom => ([null, newRoom]), err => ([err, null]));
 
