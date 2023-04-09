@@ -43,21 +43,21 @@ const registerPrivateRoomHandlers = (io:Server, socket:Socket) => {
         if (null) {
           io.to(room._id).emit('error', 'Could not find room with that id.')
           return;
-        }
-
-        const spotToBeVacated = room.occupants.indexOf(socket.id);
-        room.occupants[spotToBeVacated] = null;
-
-        if (room.gameStart) room.gameStart = false;
-
-        delete room.gameData.players[socket.id];  
-
-        await room.save().then(() => {
-          io.to(room._id).emit('private-room:update', {
-            msg: `User ${socket.id} left the room.`,
-            data: room
+        } else {
+          const spotToBeVacated = room.occupants.indexOf(socket.id);
+          room.occupants[spotToBeVacated] = null;
+          
+          if (room.gameStart) room.gameStart = false;
+          
+          delete room.gameData.players[socket.id];  
+          
+          await room.save().then(() => {
+            io.to(room._id).emit('private-room:update', {
+              msg: `User ${socket.id} left the room.`,
+              data: room
+            });
           });
-        });
+        }
       };
     });
   };
