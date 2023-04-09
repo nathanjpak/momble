@@ -13,7 +13,7 @@ router.get("/:level", async (req, res) => {
   if (!min) min = 4;
 
   const [err, result] = await WordModel.aggregate()
-    .match({ level: level })
+    .match({ level: level, phrase: false })
     .redact({ $gt: [ { "$strLenCP": "$word" }, min ] }, "$$KEEP", "$$PRUNE")
     .sample(count)
     .exec()
