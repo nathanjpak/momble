@@ -39,18 +39,23 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     });
   };
 
-  const startGame = async (room: any, level = "a1") => {
+  const startGame = async (room: any, keepTurnQueue = false, level = "a1") => {
     const word = await getWords({ level: level, count: 1, min: 5 });
     if (word) room.gameData.word = word[0].word.toLowerCase();
 
-    const turnQueue = new Array(room.occupants.length * 3);
+    if (!keepTurnQueue) {
+      const turnQueue = new Array(room.occupants.length * 3);
 
-    for (let index=0; index < room.occupants.length * 3; index++) {
-      const playerIndex = index % room.occupants.length;
-      turnQueue[index] = room.occupants[playerIndex];
-    };
-    
-    room.gameData.turnQueue = turnQueue;
+      for (let index=0; index < room.occupants.length * 3; index++) {
+        const playerIndex = index % room.occupants.length;
+        turnQueue[index] = room.occupants[playerIndex];
+      };
+
+      room.gameData.turnQueue = turnQueue;
+    }
+
+    room.gameData.guessedLetters = [];
+    room.gameData.correctLetters = [];
   }
 
   const handleWin = async (room: any, word: string, correctLetters: string[]) => {
@@ -60,15 +65,11 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     const winner = room.gameData.players.get(socket.id);
 
     winner.points += points;
-    room.gameData.word = "";
+    await startGame(room, true);
 
     await room.save();
 
-    io.to(room._id).emit("game-over", {
-      winner: socket.id,
-      word: word,
-      data: room.gameData
-    });
+    io.to(room._id).emit("game-over", room.gameData);
   };
 
   const handleTurn = async (roomId: string, sensitiveGuess: string) => {
@@ -90,6 +91,9 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
       guess === room.gameData.word : room.gameData.word.includes(guess);
 
 
+    room.gameData.turnQueue.shift();
+    room.gameData.turnQueue.push(socket.id);
+
     if (isCorrect) {
       if (isWord)
         return handleWin(room, room.gameData.word, room.gameData.correctLetters);
@@ -97,9 +101,6 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
       if (room.gameData.correctLetters.length === room.gameData.word.length)
         return handleWin(room, room.gameData.word, room.gameData.correctLetters);
     }
-
-    room.gameData.turnQueue.shift();
-    room.gameData.turnQueue.push(socket.id);
 
     const nextPlayerId = room.gameData.turnQueue[0];
     let nextPlayer = room.gameData.players.get(nextPlayerId);
