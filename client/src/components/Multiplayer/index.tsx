@@ -4,6 +4,7 @@ import socket from "../../socket";
 import EnterName from "./EnterName";
 import HangmanMultiplayer from "./Hangman";
 import MultiplayerHeader from "./Header";
+import PlayerCards from "./PlayerCards";
 
 export class RoomData {
   _id!: string;
@@ -71,15 +72,13 @@ export default function GamesRoomPage() {
   }, []);
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       {roomData?._id && <MultiplayerHeader game={roomData.game} />}
       {roomData?._id && !joinedGame && <EnterName game={roomData.game} />}
       {joinedGame && (
-        <HangmanMultiplayer
-          gameData={gameData}
-          occupants={roomData.occupants}
-        />
+        <PlayerCards gameData={gameData} occupants={roomData.occupants} />
       )}
-    </>
+      {joinedGame && <HangmanMultiplayer gameData={gameData} />}
+    </div>
   );
 }
