@@ -19,7 +19,16 @@ export default function EnterName({ game }: { game: string }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <p>Enter your name:</p>
-      <input {...register("name")} type="text" />
+      <input
+        {...register("name", {
+          required: "Name cannot be empty.",
+          maxLength: {
+            value: 25,
+            message: "Name cannot contain more than 25 characters.",
+          },
+        })}
+        type="text"
+      />
       <button type="submit">Join Game</button>
     </form>
   );
