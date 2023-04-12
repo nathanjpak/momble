@@ -84,7 +84,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     await room.save();
 
     io.to(room._id).emit("game-over", room.gameData);
-    socket.to(room._id).emit("broadcast-win", { authorId: socket.id, msg: word, points: points })
+    io.to(room._id).emit("broadcast-win", { authorId: socket.id, msg: word, points: points })
   };
 
   const handleTurn = async (roomId: string, sensitiveGuess: string) => {
@@ -135,9 +135,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
 
     await room.save().then(() => {
       io.to(roomId).emit("update-game", room.gameData);
-      (isWord) ? 
-        socket.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect }) : 
-        socket.broadcast.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect });
+      io.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect });
       console.log("Game updated.");
     });
   }

@@ -10,9 +10,17 @@ export default function Notification({ data }: { data: TNotification }) {
       ? "bg-emerald-300 before:border-t-emerald-300"
       : "bg-red-300 before:border-t-red-300";
 
+  let extraText: string | undefined = undefined;
+  if (data.points !== undefined) extraText = `+${data.points}pts`;
+  if (data.msg && data.msg.length > 1 && data.correct === false)
+    extraText = "Lost a turn!";
+
   return (
-    <p className={`${bgClass} ${bgPointerClass} ${bgColorClass}`} key={data.id}>
-      {data.points !== undefined ? `${data.msg} +${data.points}pts` : data.msg}
+    <p
+      className={`${bgClass} ${bgPointerClass} ${bgColorClass} whitespace-pre-line`}
+      key={data.id}
+    >
+      {extraText !== undefined ? data.msg + "\n" + extraText : data.msg}
     </p>
   );
 }
