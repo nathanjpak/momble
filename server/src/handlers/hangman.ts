@@ -45,10 +45,10 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
 
     room.gameData.remainingLetters = new Map<string, number>();
 
-    for (let letter of word) {
+    for (let letter of room.gameData.word) {
       if (room.gameData.remainingLetters.has(letter)) {
         room.gameData.remainingLetters.set(letter, room.gameData.remainingLetters.get(letter) + 1);
-      } else {
+      } else if (letter !== " ") {
         room.gameData.remainingLetters.set(letter, 1);
       }
     }
@@ -69,10 +69,14 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
   }
 
   const handleWin = async (room: any, word: string, correctLetters: string[]) => {
-    let points = correctLetters.length < 2 ? 100 : room.gameData.remainingLetters.size * 10;
+    let points = correctLetters.length < 2 ? 100 : (room.gameData.word.length - room.gameData.correctLetters.length) * 10;
     if (points > 100) points = 100;
     
     const winner = room.gameData.players.get(socket.id);
+
+    for (let player of room.gameData.players) {
+      player.skipTurn = false;
+    }
 
     winner.points += points;
     await startGame(room, true);
@@ -80,7 +84,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     await room.save();
 
     io.to(room._id).emit("game-over", room.gameData);
-    socket.broadcast.to(room._id).emit("broadcast-win", { authorId: socket.id, msg: word, points: points })
+    socket.to(room._id).emit("broadcast-win", { authorId: socket.id, msg: word, points: points })
   };
 
   const handleTurn = async (roomId: string, sensitiveGuess: string) => {
@@ -131,7 +135,9 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
 
     await room.save().then(() => {
       io.to(roomId).emit("update-game", room.gameData);
-      socket.broadcast.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect });
+      (isWord) ? 
+        socket.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect }) : 
+        socket.broadcast.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect });
       console.log("Game updated.");
     });
   }
