@@ -71,7 +71,7 @@ const keyboardStyle = {
 const buttonClassNames = {
   default:
     "bg-white shadow shadow-sm hover:enabled:shadow-md hover:enabled:-translate-y-0.5 active:shadow-sm active:enabled:transform-none",
-  active: "bg-cyan-300 text-white",
+  active: "bg-emerald-300 text-white",
   inactive: "opacity-40 bg-red-400 text-white",
 };
 

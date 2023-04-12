@@ -18,6 +18,9 @@ export class HangmanData {
     @prop({ default: "" })
     public word!: string;
 
+    @prop({ type: () => Number, _id: false, default: new Map<string, number>()})
+    public remainingLetters!: Map<string, number>
+
     @prop({ type: String, required: true, default: [] })
     public guessedLetters!: mongoose.Types.Array<String>;
 
@@ -30,7 +33,7 @@ export class HangmanData {
     @prop({ type: String, required: true, default: [] })
     public turnQueue!: Array<string>;
 
-    @prop({ type: () => HangmanPlayer, _id: false, default: new Map<string, HangmanPlayer>})
+    @prop({ type: () => HangmanPlayer, _id: false, default: new Map<string, HangmanPlayer>()})
     public players!: Map<string, HangmanPlayer>;
 }
 

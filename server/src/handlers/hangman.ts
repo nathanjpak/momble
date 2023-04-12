@@ -43,6 +43,16 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     const word = await getWords({ level: level, count: 1, min: 5 });
     if (word) room.gameData.word = word[0].word.toLowerCase();
 
+    room.gameData.remainingLetters = new Map<string, number>();
+
+    for (let letter of word) {
+      if (room.gameData.remainingLetters.has(letter)) {
+        room.gameData.remainingLetters.set(letter, room.gameData.remainingLetters.get(letter) + 1);
+      } else {
+        room.gameData.remainingLetters.set(letter, 1);
+      }
+    }
+
     if (!keepTurnQueue) {
       const turnQueue = new Array(room.occupants.length * 3);
 
@@ -59,7 +69,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
   }
 
   const handleWin = async (room: any, word: string, correctLetters: string[]) => {
-    let points = (word.length - correctLetters.length) * 10;
+    let points = correctLetters.length < 2 ? 100 : room.gameData.remainingLetters.size * 10;
     if (points > 100) points = 100;
     
     const winner = room.gameData.players.get(socket.id);
@@ -70,6 +80,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     await room.save();
 
     io.to(room._id).emit("game-over", room.gameData);
+    socket.broadcast.to(room._id).emit("broadcast-win", { authorId: socket.id, msg: word, points: points })
   };
 
   const handleTurn = async (roomId: string, sensitiveGuess: string) => {
@@ -98,7 +109,8 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
       if (isWord)
         return handleWin(room, room.gameData.word, room.gameData.correctLetters);
       room.gameData.correctLetters.push(guess);
-      if (room.gameData.correctLetters.length === room.gameData.word.length)
+      room.gameData.remainingLetters.delete(guess);
+      if (room.gameData.remainingLetters.size === 0)
         return handleWin(room, room.gameData.word, room.gameData.correctLetters);
     }
 
@@ -119,6 +131,7 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
 
     await room.save().then(() => {
       io.to(roomId).emit("update-game", room.gameData);
+      socket.broadcast.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect });
       console.log("Game updated.");
     });
   }

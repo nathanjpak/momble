@@ -56,6 +56,7 @@ export default function GamesRoomPage() {
     socket.on("disconnect", onDisconnect);
     socket.on("private-room:update", roomUpdateListener);
     socket.on("update-game", gameUpdateListener);
+    socket.on("game-over", gameUpdateListener);
 
     socket.connect();
     socket.emit("private-room:join", roomId, (roomData: RoomData) => {
@@ -68,6 +69,7 @@ export default function GamesRoomPage() {
       socket.off("disconnect", onDisconnect);
       socket.off("private-room:update", roomUpdateListener);
       socket.off("update-game", gameUpdateListener);
+      socket.off("game-over", gameUpdateListener);
     };
   }, []);
 
