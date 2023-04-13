@@ -3,7 +3,6 @@ import { HangmanPlayer } from "../models/Games";
 import { PrivateRoomModel } from "../models/PrivateRoom";
 import { getWords } from "./util/functions";
 
-// Should I handle deleting player data on disconnecting?
 const registerHangmanHandlers = (io:Server, socket:Socket) => {
   const updatePlayer = async (roomId: string, playerData: HangmanPlayer) => {
     console.log(`player update from ${roomId}`);
@@ -143,7 +142,11 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
   const handleDisconnect = async () => {
     if (socket.data.gameRoom) {
       const room = await PrivateRoomModel.findOne( {_id: socket.data.gameRoom} );
-      room?.gameData.players.delete(socket.id);
+      if (!room) return;
+      if (room.game !== "hangman") return;
+      room.gameData.players.delete(socket.id);
+      room.gameData.turnQueue = [];
+      room.gameData.word = "";
       await room?.save().then(() => {
         io.to(room._id).emit("update-game", room.gameData);
       });
