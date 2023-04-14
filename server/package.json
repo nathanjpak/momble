@@ -7,7 +7,8 @@
     "build": "rm -rf build/ && tsc",
     "prestart": "npm run build",
     "start": "node build/server.js",
-    "dev": "node src/server.ts"
+    "dev": "node src/server.ts",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@typegoose/typegoose": "^11.0.0",
