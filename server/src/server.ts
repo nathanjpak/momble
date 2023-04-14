@@ -79,7 +79,7 @@ const StartServer = () => {
   // Setup web socket
   const io = new Server(httpServer, {
     cors: {
-      origin: "http://localhost:3000"
+      origin: process.env.CLIENT_ADDRESS
     }
   });
 
