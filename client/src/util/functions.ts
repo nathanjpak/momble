@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const rootUrl = "http://localhost:2021";
+const rootUrl = process.env.REACT_APP_SERVER_API_ENDPOINT;
 
 // API functions
 export function fetchWord(
