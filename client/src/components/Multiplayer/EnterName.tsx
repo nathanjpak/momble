@@ -10,9 +10,6 @@ export default function EnterName({ game }: { game: string }) {
 
   const onSubmit = async (data: any) => {
     const player = new HangmanPlayer(data.name, 0, true);
-
-    console.log(player);
-
     socket.emit(`${game}:update-player`, roomId, player);
   };
 

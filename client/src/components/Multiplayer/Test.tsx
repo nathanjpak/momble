@@ -7,12 +7,10 @@ export default function TestGame() {
   useEffect(() => {
     const onConnect = () => {
       setIsConnected(true);
-      console.log(true);
     };
 
     const onDisconnect = () => {
       setIsConnected(false);
-      console.log(false);
     };
 
     socket.on("connect", onConnect);

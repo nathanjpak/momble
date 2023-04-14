@@ -5,9 +5,6 @@ import { getWords } from "./util/functions";
 
 const registerHangmanHandlers = (io:Server, socket:Socket) => {
   const updatePlayer = async (roomId: string, playerData: HangmanPlayer) => {
-    console.log(`player update from ${roomId}`);
-    console.log(playerData);
-    
     const [err, room] = await PrivateRoomModel.findOne({ _id: roomId })
       .then(room => ([null, room]), err => [err, null]);
 
@@ -34,7 +31,6 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     }
     await room.save().then(() => {
       io.to(roomId).emit("update-game", room.gameData);
-      console.log('Game updated.');
     });
   };
 
@@ -135,7 +131,6 @@ const registerHangmanHandlers = (io:Server, socket:Socket) => {
     await room.save().then(() => {
       io.to(roomId).emit("update-game", room.gameData);
       io.to(roomId).emit("broadcast-guess", {authorId: socket.id, msg: guess, correct: isCorrect });
-      console.log("Game updated.");
     });
   }
 

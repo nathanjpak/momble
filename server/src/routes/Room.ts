@@ -39,8 +39,6 @@ router.post("/", async (req, res) => {
     gameData: gameData
   });
 
-  console.log(room);
-
   const [err, newRoom] = await room.save().then(newRoom => ([null, newRoom]), err => ([err, null]));
 
   (err) ? res.send(err).end() : res.status(200).send(newRoom);

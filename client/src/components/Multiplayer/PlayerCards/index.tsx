@@ -40,7 +40,6 @@ export default function PlayerCards({
         ...prev,
         { id: newId, msg, authorId, correct },
       ]);
-      console.log(authorId, msg, correct);
 
       setTimeout(() => {
         setNotifications((prev) => prev.filter((value) => value.id !== newId));
